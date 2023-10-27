@@ -1,9 +1,9 @@
-import React from 'react';
-import styled from 'styled-components/macro';
+import React from "react";
+import styled from "styled-components/macro";
 
-import { COLORS, WEIGHTS } from '../../constants';
-import { formatPrice, pluralize, isNewShoe } from '../../utils';
-import Spacer from '../Spacer';
+import { COLORS, WEIGHTS } from "../../constants";
+import { formatPrice, pluralize, isNewShoe } from "../../utils";
+import Spacer from "../Spacer";
 
 const ShoeCard = ({
   slug,
@@ -30,20 +30,39 @@ const ShoeCard = ({
     : isNewShoe(releaseDate)
       ? 'new-release'
       : 'default'
-
   return (
     <Link href={`/shoe/${slug}`}>
       <Wrapper>
         <ImageWrapper>
+          {variant !== "default" ? (
+            <Variant
+              backgroundColor={
+                variant === "on-sale" ? COLORS.primary : COLORS.secondary
+              }
+            >
+              {variant}
+            </Variant>
+          ) : (
+            ""
+          )}
           <Image alt="" src={imageSrc} />
         </ImageWrapper>
         <Spacer size={12} />
         <Row>
           <Name>{name}</Name>
-          <Price>{formatPrice(price)}</Price>
+            <Price
+              style={{
+                "--color": salePrice ? "hsl(220deg, 5%, 40%)" : "white",
+                "--text-dec": salePrice ? "line-through" : "none",
+              }}
+            >
+              {formatPrice(price)}
+            </Price>
+
         </Row>
         <Row>
-          <ColorInfo>{pluralize('Color', numOfColors)}</ColorInfo>
+          <ColorInfo>{pluralize("Color", numOfColors)}</ColorInfo>
+          {salePrice ? <SalePrice>{formatPrice(salePrice)}</SalePrice> : ""}
         </Row>
       </Wrapper>
     </Link>
@@ -53,18 +72,38 @@ const ShoeCard = ({
 const Link = styled.a`
   text-decoration: none;
   color: inherit;
+  flex: 1;
+  min-width: 270px;
 `;
-
-const Wrapper = styled.article``;
+const PriceRow = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+const Wrapper = styled.article`
+`;
+const Variant = styled.div`
+  position: absolute;
+  top: 12px;
+  right: -4px;
+  color: white;
+  padding: 9px;
+  border-radius: 2px;
+  background-color: ${(props) => props.backgroundColor};
+`;
 
 const ImageWrapper = styled.div`
   position: relative;
 `;
 
-const Image = styled.img``;
+const Image = styled.img`
+  width: 100%;
+  border-radius: 16px;
+`;
 
 const Row = styled.div`
   font-size: 1rem;
+  display: flex;
+  justify-content: space-between;
 `;
 
 const Name = styled.h3`
@@ -72,7 +111,10 @@ const Name = styled.h3`
   color: ${COLORS.gray[900]};
 `;
 
-const Price = styled.span``;
+const Price = styled.span`
+  color: var(--color);
+  text-decoration: var(--text-dec);
+`;
 
 const ColorInfo = styled.p`
   color: ${COLORS.gray[700]};
